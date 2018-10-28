@@ -108,6 +108,8 @@ RUN make -j4 \
 # Default to running the Python 3 interpreter command.
 WORKDIR /
 
+ENV READTHEDOCS True
+
 # Copy requirements.txt first for better cache on later pushes
 COPY ./requirements.txt /requirements.txt
 
