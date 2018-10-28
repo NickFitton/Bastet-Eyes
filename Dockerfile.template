@@ -15,7 +15,7 @@ WORKDIR /usr/src/app
 COPY ./requirements.txt /requirements.txt
 
 # Update pip version
-pip install --upgrade pip'
+RUN pip install --upgrade pip
 
 # pip install python deps from requirements.txt on the resin.io build server
 RUN pip install -r /requirements.txt
