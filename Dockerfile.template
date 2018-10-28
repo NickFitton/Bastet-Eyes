@@ -13,13 +13,6 @@ WORKDIR /usr/src/app
 
 ENV READTHEDOCS True
 
-# Properly install opencv
-RUN apt-get install -y libopencv-dev
-
-RUN apt-get install -y nano libraspberrypi-bin fbi
-
-RUN apt-get install -y python-opencv
-
 # Copy requirements.txt first for better cache on later pushes
 COPY ./requirements.txt /requirements.txt
 
