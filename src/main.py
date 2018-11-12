@@ -20,7 +20,7 @@ initialization_time = floor(time())
 
 fgbg = cv2.createBackgroundSubtractorMOG2()
 
-cameraFeed = cv2.VideoCapture('rtsp://192.168.0.15:554/user=user2_pas$
+cameraFeed = cv2.VideoCapture('rtsp://192.168.0.15:554/user=user2_password=Lostinblue2_channel=2_stream=0.sdp')
 cameraFeed.set(cv2.CAP_PROP_FPS, 15)
 
 #camera = PiCamera()
