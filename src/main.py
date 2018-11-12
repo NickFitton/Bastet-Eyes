@@ -58,14 +58,12 @@ start_time = time()
 while True:
     frame = cameraFeed.read()[1]
     if frame is None:
-        log("Received a broken frame")
         cameraFeed = cv2.VideoCapture('rtsp://192.168.0.15:554/user=user2_password=Lostinblue2_channel=2_stream=0.sdp')
         log("Stream restarted")
     elif time() - start_time < 5:
         log("Waiting for camera exposure")
         sleep(5)
     else:
-        log("Received a working frame")
         original_frame = frame.copy()
 
         preexisting_entities = captured_entities.copy()
