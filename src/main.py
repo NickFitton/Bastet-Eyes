@@ -19,10 +19,14 @@ current_path = getcwd()
 initialization_time = floor(time())
 
 fgbg = cv2.createBackgroundSubtractorMOG2()
-camera = PiCamera()
-camera.resolution = (1640, 1232)
-camera.framerate = 32
-rawCapture = PiRGBArray(camera)
+
+cameraFeed = cv2.VideoCapture('rtsp://192.168.0.15:554/user=user2_pas$
+cameraFeed.set(cv2.CAP_PROP_FPS, 15)
+
+#camera = PiCamera()
+#camera.resolution = (1640, 1232)
+#camera.framerate = 32
+#rawCapture = PiRGBArray(camera)
 
 minContourArea = 4000
 captured_entities = []
@@ -59,12 +63,15 @@ def save_to_local(image, entry_time, exit_time):
 
 
 start_time = time()
-for rawCapture in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+# for rawCapture in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+while True:
+    frame = cameraFeed.read()[1]
+    original_frame = frame.copy()
     if time() - start_time < 5:
         log("Waiting for camera exposure")
         sleep(5)
-    frame = rawCapture.array
-    original_frame = frame.copy()
+    # frame = rawCapture.array
+    # original_frame = frame.copy()
 
     preexisting_entities = captured_entities.copy()
     mog_contours = background_diff_mog_2(frame)
