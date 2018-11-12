@@ -20,11 +20,6 @@ fgbg = cv2.createBackgroundSubtractorMOG2()
 
 cameraFeed = cv2.VideoCapture('rtsp://192.168.0.15:554/user=user2_password=Lostinblue2_channel=2_stream=0.sdp')
 
-#camera = PiCamera()
-#camera.resolution = (1640, 1232)
-#camera.framerate = 32
-#rawCapture = PiRGBArray(camera)
-
 minContourArea = 4000
 captured_entities = []
 
@@ -60,20 +55,16 @@ def save_to_local(image, entry_time, exit_time):
 
 
 start_time = time()
-# for rawCapture in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 while True:
     frame = cameraFeed.read()[1]
     if frame is None:
         log("Received a broken frame")
-        cameraFeed = cv2.VideoCapture('rtsp://192.168.0.15:554/user=user2_password=Lostinblue2_channel=2_stream=0.sdp')
         sleep(2)
+    elif time() - start_time < 5:
+        log("Waiting for camera exposure")
+        sleep(5)
     else:
         original_frame = frame.copy()
-        if time() - start_time < 5:
-            log("Waiting for camera exposure")
-            sleep(5)
-        # frame = rawCapture.array
-        # original_frame = frame.copy()
 
         preexisting_entities = captured_entities.copy()
         mog_contours = background_diff_mog_2(frame)
