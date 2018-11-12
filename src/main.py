@@ -66,6 +66,7 @@ while True:
     frame = cameraFeed.read()[1]
     if frame is None:
         log("Received a broken frame")
+        sleep(0.5)
     else:
         original_frame = frame.copy()
         if time() - start_time < 5:
