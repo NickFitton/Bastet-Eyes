@@ -64,6 +64,7 @@ while True:
         log("Waiting for camera exposure")
         sleep(5)
     else:
+        log("Received a working frame")
         original_frame = frame.copy()
 
         preexisting_entities = captured_entities.copy()
