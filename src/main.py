@@ -64,49 +64,52 @@ start_time = time()
 # for rawCapture in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 while True:
     frame = cameraFeed.read()[1]
-    original_frame = frame.copy()
-    if time() - start_time < 5:
-        log("Waiting for camera exposure")
-        sleep(5)
-    # frame = rawCapture.array
-    # original_frame = frame.copy()
+    if frame is None:
+        log("Received a broken frame")
+    else:
+        original_frame = frame.copy()
+        if time() - start_time < 5:
+            log("Waiting for camera exposure")
+            sleep(5)
+        # frame = rawCapture.array
+        # original_frame = frame.copy()
 
-    preexisting_entities = captured_entities.copy()
-    mog_contours = background_diff_mog_2(frame)
+        preexisting_entities = captured_entities.copy()
+        mog_contours = background_diff_mog_2(frame)
 
-    for found_contour in mog_contours:
-        if cv2.contourArea(found_contour) >= minContourArea:
-            x, y, w, h = cv2.boundingRect(found_contour)
-            newEntity = Entity(x, y, original_frame[y:y + h, x:x + w])
-            entity_exists = False
-            for preexisting_entity in preexisting_entities:
-                if (not entity_exists) and preexisting_entity.is_entity(newEntity):
-                    preexisting_entity.update(newEntity)
-                    entity_exists = True
-                    break
+        for found_contour in mog_contours:
+            if cv2.contourArea(found_contour) >= minContourArea:
+                x, y, w, h = cv2.boundingRect(found_contour)
+                newEntity = Entity(x, y, original_frame[y:y + h, x:x + w])
+                entity_exists = False
+                for preexisting_entity in preexisting_entities:
+                    if (not entity_exists) and preexisting_entity.is_entity(newEntity):
+                        preexisting_entity.update(newEntity)
+                        entity_exists = True
+                        break
 
-            if not entity_exists:
-                log("Adding new entity")
-                captured_entities.append(newEntity)
+                if not entity_exists:
+                    log("Adding new entity")
+                    captured_entities.append(newEntity)
 
-    for existingEntity in captured_entities:
-        if time() - existingEntity.last_active > 5:
-            log("Entity '{}' became inactive, reporting".format(existingEntity.id))
-            save_to_server(existingEntity.best_image, existingEntity.first_active, existingEntity.last_active,
-                           existingEntity.image_time)
-            captured_entities.remove(existingEntity)
-        else:
-            cv2.rectangle(frame,
-                          (existingEntity.x, existingEntity.y),
-                          (existingEntity.x + existingEntity.image.shape[1],
-                           existingEntity.y + existingEntity.image.shape[0]),
-                          (existingEntity.b, existingEntity.g, existingEntity.r), 2)
-#    cv2.imshow("Image", frame)
+        for existingEntity in captured_entities:
+            if time() - existingEntity.last_active > 5:
+                log("Entity '{}' became inactive, reporting".format(existingEntity.id))
+                save_to_server(existingEntity.best_image, existingEntity.first_active, existingEntity.last_active,
+                               existingEntity.image_time)
+                captured_entities.remove(existingEntity)
+            else:
+                cv2.rectangle(frame,
+                              (existingEntity.x, existingEntity.y),
+                              (existingEntity.x + existingEntity.image.shape[1],
+                               existingEntity.y + existingEntity.image.shape[0]),
+                              (existingEntity.b, existingEntity.g, existingEntity.r), 2)
+    #    cv2.imshow("Image", frame)
 
-    # rawCapture.truncate(0)
-    key = cv2.waitKey(1) & 0xFF
+        # rawCapture.truncate(0)
+        key = cv2.waitKey(1) & 0xFF
 
-    if key == ord("q"):
-        break
-    elif key == ord("r"):
-        captured_entities = []
+        if key == ord("q"):
+            break
+        elif key == ord("r"):
+            captured_entities = []
