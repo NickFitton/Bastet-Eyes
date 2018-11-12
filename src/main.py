@@ -1,7 +1,5 @@
 from os import getcwd, remove
 
-from picamera.array import PiRGBArray
-from picamera import PiCamera
 from math import floor
 from time import time, sleep
 import cv2
@@ -105,7 +103,7 @@ while True:
                           (existingEntity.b, existingEntity.g, existingEntity.r), 2)
 #    cv2.imshow("Image", frame)
 
-    rawCapture.truncate(0)
+    # rawCapture.truncate(0)
     key = cv2.waitKey(1) & 0xFF
 
     if key == ord("q"):
