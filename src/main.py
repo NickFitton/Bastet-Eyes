@@ -20,7 +20,7 @@ initialization_time = floor(time())
 
 fgbg = cv2.createBackgroundSubtractorMOG2()
 camera = PiCamera()
-camera.resolution = (3280, 2464)
+camera.resolution = (1640, 1232)
 camera.framerate = 32
 camera.rotation = 180
 rawCapture = PiRGBArray(camera)
