@@ -25,7 +25,7 @@ camera.framerate = 32
 camera.rotation = 180
 rawCapture = PiRGBArray(camera)
 
-minContourArea = 4000
+minContourArea = 6000
 captured_entities = []
 
 log("Setup complete, recording")
