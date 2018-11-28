@@ -1,2 +1,6 @@
-env/
-.idea/
+# IDE
+.idea
+
+# Python
+env
+*/__pycache__
