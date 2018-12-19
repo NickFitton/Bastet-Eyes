@@ -1,16 +1,20 @@
-from os import getcwd, remove, path, makedirs
+from os import getcwd, path, makedirs
 
-from math import floor
-from time import time
 import cv2
-import requests
-import sys
+import logging
+from sys import argv
+from time import time
+from math import floor
 
 from watcher.entities import Entity
+from watcher.request import register_with_server, get_access_token, add_motion
 
-
-def log(line):
-    print("[{}]:\t{}".format(floor(time()), line))
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s:\t%(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    level=logging.DEBUG,
+)
+logger = logging.getLogger(__name__)
 
 
 def background_diff_mog_2(image):
@@ -20,31 +24,6 @@ def background_diff_mog_2(image):
     return cv2.findContours(
         threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
     )[1]
-
-
-def save_to_server(image, entry_time, exit_time, image_time):
-    metadata = {
-        "entryTime": str(entry_time),
-        "exitTime": str(exit_time),
-        "imageTime": str(image_time),
-    }
-    image_id = requests.post("{}:8080/image".format(backend_url), json=metadata).json()[
-        "id"
-    ]
-
-    file_location = "{}.jpg".format(image_id)
-
-    cv2.imwrite(file_location, image)
-
-    imagefile = {"file": open(file_location, "rb")}
-    response = requests.patch(
-        "{}:8080/image/{}".format(backend_url, image_id), files=imagefile
-    )
-    if response.status_code == 202:
-        remove(file_location)
-        log("Image uploaded successfully, removed from local storage")
-    else:
-        log("Persisting image locally due to failure of connection with server")
 
 
 def save_to_local(image, entry_time, exit_time):
@@ -71,12 +50,14 @@ def movement_recognition(existing_entities, new_frame):
                     break
 
             if not entity_exists:
-                log("Adding new entity")
+                logger.debug("Adding new entity")
                 captured_entities.append(new_entity)
 
     for existingEntity in captured_entities:
         if time() - existingEntity.last_active > 2:
-            log("Entity '{}' became inactive, reporting".format(existingEntity.id))
+            logger.debug(
+                "Entity '{}' became inactive, reporting".format(existingEntity.id)
+            )
             if backend_url == "":
                 save_to_local(
                     existingEntity.best_image,
@@ -84,12 +65,7 @@ def movement_recognition(existing_entities, new_frame):
                     existingEntity.last_active,
                 )
             else:
-                save_to_server(
-                    existingEntity.best_image,
-                    existingEntity.first_active,
-                    existingEntity.last_active,
-                    existingEntity.image_time,
-                )
+                add_motion(backend_url, token, existingEntity)
             captured_entities.remove(existingEntity)
         else:
             cv2.rectangle(
@@ -140,16 +116,20 @@ def configuration(arguments):
     return server_url, media_url, contour
 
 
-backend_url, mjpg_url, minContourArea = configuration(sys.argv)
+backend_url, mjpg_url, minContourArea = configuration(argv)
 current_path = getcwd()
-log(current_path)
-initialization_time = floor(time())
 
+try:
+    new_id, new_password = register_with_server(backend_url)
+    token = get_access_token(backend_url, new_id, new_password)
+except ConnectionError as e:
+    logger.error(e)
+logger.info("Starting")
 fgbg = cv2.createBackgroundSubtractorMOG2()
 
 captured_entities = []
 
-log("Setup complete, recording")
+logger.info("Setup complete, recording")
 
 cap = cv2.VideoCapture(mjpg_url)
 while True:

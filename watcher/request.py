@@ -5,14 +5,12 @@ import string
 import os
 import base64
 from cv2 import imwrite
-import cv2
-from watcher.entities import Entity
 from requests.exceptions import InvalidSchema
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s:\t%(message)s",
     datefmt="%m/%d/%Y %I:%M:%S %p",
-    level=logging.INFO,
+    level=logging.DEBUG,
 )
 logger = logging.getLogger(__name__)
 data_location = "/tmp/watcher"
@@ -140,6 +138,7 @@ def get_access_token(server_url, camera_id, password):
 
 
 def add_motion(server_url, auth_token, new_entity):
+    logger.info("Saving recorded motion")
     metadata = {
         "entryTime": str(new_entity.first_active),
         "exitTime": str(new_entity.last_active),
@@ -166,13 +165,13 @@ def add_motion(server_url, auth_token, new_entity):
     __parse_response(response, 202)
 
 
-try:
-    url = "http://localhost:8080"
-    new_id, new_password = register_with_server(url)
-    logger.info("[id: {}, password: {}]".format(new_id, new_password))
-    token = get_access_token(url, new_id, new_password)
-    image = cv2.imread("/tmp/test.jpg")
-    entity = Entity(50, 20, image)
-    add_motion(url, token, entity)
-except ConnectionError as e:
-    logger.error(e)
+# try:
+#     url = "http://localhost:8080"
+#     new_id, new_password = register_with_server(url)
+#     logger.info("[id: {}, password: {}]".format(new_id, new_password))
+#     token = get_access_token(url, new_id, new_password)
+#     image = cv2.imread("/tmp/test.jpg")
+#     entity = Entity(50, 20, image)
+#     add_motion(url, token, entity)
+# except ConnectionError as e:
+#     logger.error(e)
