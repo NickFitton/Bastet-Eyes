@@ -75,7 +75,7 @@ def __parse_response(response, expected_status_code):
         )
         if "error" in json:
             raise ConnectionError(
-                "Bad communication with server[status={}, error={}}".format(
+                "Bad communication with server[status={}, error={}]".format(
                     response.status_code, json["error"]
                 )
             )
@@ -141,11 +141,11 @@ def get_access_token(server_url, camera_id, password):
 
 def add_motion(server_url, auth_token, new_entity):
     metadata = {
-        "entryTime": str(new_entity.entry_time),
-        "exitTime": str(new_entity.exit_time),
+        "entryTime": str(new_entity.first_active),
+        "exitTime": str(new_entity.last_active),
         "imageTime": str(new_entity.image_time),
     }
-    headers = {"authorization": "Token " + auth_token}
+    headers = {"authorization": "Token {}".format(auth_token)}
     response = requests.post(
         "{}/v1/motion".format(server_url), json=metadata, headers=headers
     )
@@ -159,7 +159,9 @@ def add_motion(server_url, auth_token, new_entity):
 
     image_file = {"file": open(file_location, "rb")}
     response = requests.patch(
-        "{}/v1/motion/{}".format(server_url, image_id), files=image_file
+        "{}/v1/motion/{}".format(server_url, image_id),
+        files=image_file,
+        headers=headers,
     )
     __parse_response(response, 202)
 
@@ -169,7 +171,7 @@ try:
     new_id, new_password = register_with_server(url)
     logger.info("[id: {}, password: {}]".format(new_id, new_password))
     token = get_access_token(url, new_id, new_password)
-    image = cv2.imread("test.jpg")
+    image = cv2.imread("/tmp/test.jpg")
     entity = Entity(50, 20, image)
     add_motion(url, token, entity)
 except ConnectionError as e:
