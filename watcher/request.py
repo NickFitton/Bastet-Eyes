@@ -15,35 +15,35 @@ credentials_location = "/tmp/watcher"
 credentials_file_name = "credentials.csv"
 
 
-def generate_password():
+def __generate_password():
     return "".join(
         random.SystemRandom().choice(string.ascii_letters + string.digits)
         for _ in range(20)
     )
 
 
-def save_credentials(camera_id, password):
+def __save_credentials(camera_id, password):
     if not os.path.isdir(credentials_location):
         os.mkdir(credentials_location)
     with open(os.path.join(credentials_location, credentials_file_name), "w+") as file:
         file.write("{},{}".format(camera_id, password))
 
 
-def load_credentials():
+def __load_credentials():
     with open(os.path.join(credentials_location, credentials_file_name), "r") as file:
         return file.read().split(",")
 
 
-def credentials_exist():
+def __credentials_exist():
     return os.path.isfile(os.path.join(credentials_location, credentials_file_name))
 
 
 def register_with_server(server_url):
-    if credentials_exist():
+    if __credentials_exist():
         logger.debug("Loading previously saved credentials")
-        return load_credentials()
+        return __load_credentials()
 
-    password = generate_password()
+    password = __generate_password()
     body = {"password": password}
 
     try:
@@ -75,7 +75,7 @@ def register_with_server(server_url):
             )
         elif "data" in json:
             data = json["data"]
-            save_credentials(data["id"], password)
+            __save_credentials(data["id"], password)
             return data["id"], password
         else:
             raise ConnectionError(
