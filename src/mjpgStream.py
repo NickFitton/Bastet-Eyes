@@ -16,21 +16,31 @@ def log(line):
 def background_diff_mog_2(image):
     fg_mask = fgbg.apply(image)
     threshold = cv2.threshold(fg_mask, 128, 255, cv2.THRESH_BINARY)[1]
-    cv2.imshow('mog_threshold', threshold)
-    return cv2.findContours(threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[1]
+    cv2.imshow("mog_threshold", threshold)
+    return cv2.findContours(
+        threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+    )[1]
 
 
 def save_to_server(image, entry_time, exit_time, image_time):
-    metadata = {'entryTime': str(entry_time), 'exitTime': str(exit_time), 'imageTime': str(image_time)}
-    image_id = requests.post('http://192.168.0.28:8080/image', json=metadata).json()["id"]
+    metadata = {
+        "entryTime": str(entry_time),
+        "exitTime": str(exit_time),
+        "imageTime": str(image_time),
+    }
+    image_id = requests.post("http://192.168.0.28:8080/image", json=metadata).json()[
+        "id"
+    ]
     print(image_id)
 
     file_location = "{}.jpg".format(image_id)
 
     cv2.imwrite(file_location, image)
 
-    imagefile = {'file': open(file_location, 'rb')}
-    response = requests.patch('http://192.168.0.28:8080/image/{}'.format(image_id), files=imagefile)
+    imagefile = {"file": open(file_location, "rb")}
+    response = requests.patch(
+        "http://192.168.0.28:8080/image/{}".format(image_id), files=imagefile
+    )
     if response.status_code == 202:
         remove(file_location)
         log("Image uploaded successfully, removed from local storage")
@@ -77,7 +87,7 @@ while True:
     for found_contour in mog_contours:
         if cv2.contourArea(found_contour) >= minContourArea:
             x, y, w, h = cv2.boundingRect(found_contour)
-            newEntity = Entity(x, y, original_frame[y:y + h, x:x + w])
+            newEntity = Entity(x, y, original_frame[y : y + h, x : x + w])
             entity_exists = False
             for preexisting_entity in preexisting_entities:
                 if (not entity_exists) and preexisting_entity.is_entity(newEntity):
@@ -92,18 +102,27 @@ while True:
     for existingEntity in captured_entities:
         if time() - existingEntity.last_active > 2:
             log("Entity '{}' became inactive, reporting".format(existingEntity.id))
-            save_to_local(existingEntity.best_image, existingEntity.first_active, existingEntity.last_active)
+            save_to_local(
+                existingEntity.best_image,
+                existingEntity.first_active,
+                existingEntity.last_active,
+            )
             # save_to_server(existingEntity.best_image, existingEntity.first_active, existingEntity.last_active,
             #                existingEntity.image_time)
             captured_entities.remove(existingEntity)
         else:
-            cv2.rectangle(frame,
-                          (existingEntity.x, existingEntity.y),
-                          (existingEntity.x + existingEntity.image.shape[1],
-                           existingEntity.y + existingEntity.image.shape[0]),
-                          (existingEntity.b, existingEntity.g, existingEntity.r), 2)
+            cv2.rectangle(
+                frame,
+                (existingEntity.x, existingEntity.y),
+                (
+                    existingEntity.x + existingEntity.image.shape[1],
+                    existingEntity.y + existingEntity.image.shape[0],
+                ),
+                (existingEntity.b, existingEntity.g, existingEntity.r),
+                2,
+            )
 
-    cv2.imshow('Video', frame)
+    cv2.imshow("Video", frame)
     key = cv2.waitKey(1) & 0xFF
 
     if key == ord("q"):
