@@ -8,6 +8,7 @@
 # To enable this hook, rename this file to "pre-commit".
 
 black watcher/*
+git add .
 
 if git rev-parse --verify HEAD >/dev/null 2>&1
 then
