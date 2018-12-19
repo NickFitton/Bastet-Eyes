@@ -7,7 +7,7 @@
 #
 # To enable this hook, rename this file to "pre-commit".
 
-black src/*
+black watcher/*
 
 if git rev-parse --verify HEAD >/dev/null 2>&1
 then
