@@ -3,4 +3,8 @@
 
 # Python
 env
+build
+dist
+pip-selfcheck.json
 */__pycache__
+*.egg-info

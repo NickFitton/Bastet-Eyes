@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name="cameraWatcher",
@@ -9,6 +9,6 @@ setup(
     url="https://github.com/NickFitton/Intelligent-CCTV_camera",
     packages=["watcher"],
     install_requires=[
-        "numpy>=1.15.1" "requests>=2.20.0" "black>=18.9b0" "opencv-python==3.4.4.19"
+        "numpy>=1.15.1", "requests>=2.20.0", "black>=18.9b0", "opencv-python==3.4.4.19"
     ],
 )

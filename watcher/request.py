@@ -4,6 +4,9 @@ import random
 import string
 import os
 import base64
+from cv2 import imwrite
+import cv2
+from watcher.entities import Entity
 from requests.exceptions import InvalidSchema
 
 logging.basicConfig(
@@ -113,14 +116,14 @@ def register_with_server(server_url):
         raise ConnectionError("Failed to connect to server")
 
 
-def get_access_token(server_url, id, password):
+def get_access_token(server_url, camera_id, password):
     if __token_exist():
         logger.debug("Loading previously saved token")
         return __load_token()
 
-    auth_combo = base64.b64encode("{}:{}".format(id, password).encode("utf-8")).decode(
-        "utf-8"
-    )
+    auth_combo = base64.b64encode(
+        "{}:{}".format(camera_id, password).encode("utf-8")
+    ).decode("utf-8")
     auth_header = "Basic {}".format(auth_combo)
     logger.info(auth_header)
     headers = {"authorization": auth_header}
@@ -136,10 +139,38 @@ def get_access_token(server_url, id, password):
         raise ConnectionError("Failed to connect to server")
 
 
+def add_motion(server_url, auth_token, new_entity):
+    metadata = {
+        "entryTime": str(new_entity.entry_time),
+        "exitTime": str(new_entity.exit_time),
+        "imageTime": str(new_entity.image_time),
+    }
+    headers = {"authorization": "Token " + auth_token}
+    response = requests.post(
+        "{}/v1/motion".format(server_url), json=metadata, headers=headers
+    )
+    data = __parse_response(response, 201)
+    image_id = data["id"]
+
+    file_name = "{}.jpg".format(image_id)
+    file_location = os.path.join(data_location, file_name)
+
+    imwrite(file_location, new_entity.best_image)
+
+    image_file = {"file": open(file_location, "rb")}
+    response = requests.patch(
+        "{}/v1/motion/{}".format(server_url, image_id), files=image_file
+    )
+    __parse_response(response, 202)
+
+
 try:
     url = "http://localhost:8080"
     new_id, new_password = register_with_server(url)
     logger.info("[id: {}, password: {}]".format(new_id, new_password))
     token = get_access_token(url, new_id, new_password)
+    image = cv2.imread("test.jpg")
+    entity = Entity(50, 20, image)
+    add_motion(url, token, entity)
 except ConnectionError as e:
     logger.error(e)

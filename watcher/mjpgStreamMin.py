@@ -6,7 +6,7 @@ import cv2
 import requests
 import sys
 
-from entities import Entity
+from watcher.entities import Entity
 
 
 def log(line):
