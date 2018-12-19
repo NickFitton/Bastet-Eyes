@@ -62,3 +62,23 @@ class Entity:
         ):
             self.best_image = entity.image
             self.image_time = self.last_active
+
+
+class Statistic:
+    def __init__(self):
+        self.initialized_at = time()
+        self.entity_count = 0
+        self.interim_times = []
+
+    def set_count(self, count):
+        self.entity_count = count
+
+    def add_time(self):
+        self.interim_times.append(time())
+
+    def print_line(self):
+        line = "{},{}".format(self.entity_count, self.initialized_at)
+        for interim_time in self.interim_times:
+            line += ",{}".format(interim_time)
+        line += "\n"
+        return line

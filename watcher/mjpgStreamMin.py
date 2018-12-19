@@ -4,15 +4,16 @@ from sys import argv
 from time import time
 from math import floor
 from os import getcwd, path, makedirs
+import os
 
-from watcher.entities import Entity
+from watcher.entities import Entity, Statistic
 from watcher.request import register_with_server, get_access_token, add_motion
 from watcher.movement import background_diff_mog_2
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s:\t%(message)s",
     datefmt="%m/%d/%Y %I:%M:%S %p",
-    level=logging.DEBUG,
+    level=logging.INFO,
 )
 logger = logging.getLogger(__name__)
 
@@ -25,10 +26,11 @@ def save_to_local(image, entry_time, exit_time):
     cv2.imwrite("/tmp/camera/{}_{}.jpg".format(tmp_entry, tmp_exit), image)
 
 
-def movement_recognition(existing_entities, new_frame):
+def movement_recognition(existing_entities, new_frame, stat):
     global fg_bg
     preexisting_entities = existing_entities.copy()
     mog_contours, fg_bg = background_diff_mog_2(new_frame, fg_bg)
+    stat.add_time()
 
     for found_contour in mog_contours:
         if cv2.contourArea(found_contour) >= minContourArea:
@@ -45,6 +47,7 @@ def movement_recognition(existing_entities, new_frame):
                 logger.debug("Adding new entity")
                 captured_entities.append(new_entity)
 
+    stat.add_time()
     for existingEntity in captured_entities:
         if time() - existingEntity.last_active > 2:
             logger.debug(
@@ -70,6 +73,7 @@ def movement_recognition(existing_entities, new_frame):
                 (existingEntity.b, existingEntity.g, existingEntity.r),
                 2,
             )
+    stat.add_time()
 
 
 def configuration(arguments):
@@ -109,7 +113,15 @@ def configuration(arguments):
 
 
 backend_url, mjpg_url, minContourArea = configuration(argv)
+stats_dir = "/tmp/stats"
+stats_file_name = str(time())
 current_path = getcwd()
+
+
+if not os.path.isdir(stats_dir):
+    os.mkdir(stats_dir)
+
+stats_file = open(os.path.join(stats_dir, stats_file_name), "a+")
 
 try:
     new_id, new_password = register_with_server(backend_url)
@@ -118,6 +130,7 @@ except ConnectionError as e:
     logger.error(e)
 logger.info("Starting")
 fg_bg = cv2.createBackgroundSubtractorMOG2()
+first_loop = True
 
 captured_entities = []
 
@@ -125,10 +138,25 @@ logger.info("Setup complete, recording")
 
 cap = cv2.VideoCapture(mjpg_url)
 while True:
+    stat = Statistic()
     ret, frame = cap.read()
+    stat.add_time()
     original_frame = frame.copy()
 
-    movement_recognition(captured_entities, frame)
+    stat.add_time()
+    movement_recognition(captured_entities, frame, stat)
+
+    stat.set_count(len(captured_entities))
+
+    if first_loop:
+        first_loop = False
+        headers = "count,start"
+        times = len(stat.interim_times)
+        for num in range(times):
+            headers += ",{}".format(num + 1)
+        headers += "\n"
+        stats_file.write(headers)
+    stats_file.write(stat.print_line())
 
     cv2.imshow("Video", frame)
     key = cv2.waitKey(1) & 0xFF
@@ -137,3 +165,5 @@ while True:
         break
     elif key == ord("r"):
         captured_entities = []
+
+stats_file.close()
