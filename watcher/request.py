@@ -137,9 +137,10 @@ def get_access_token(server_url, id, password):
 
 
 try:
-    new_id, new_password = register_with_server("http://localhost:8080")
+    url = "http://localhost:8080"
+    new_id, new_password = register_with_server(url)
     logger.info(
         "[id: {}, password: {}]".format(new_id, new_password))
-    token = get_access_token("http://localhost:8080", new_id, new_password)
+    token = get_access_token(url, new_id, new_password)
 except ConnectionError as e:
     logger.error(e)
