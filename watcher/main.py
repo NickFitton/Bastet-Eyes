@@ -18,7 +18,7 @@ log("Setting up")
 current_path = getcwd()
 initialization_time = floor(time())
 
-fgbg = cv2.createBackgroundSubtractorMOG2()
+fg_bg = cv2.createBackgroundSubtractorMOG2()
 camera = PiCamera()
 camera.resolution = (1640, 1232)
 camera.framerate = 32
@@ -32,7 +32,7 @@ log("Setup complete, recording")
 
 
 def background_diff_mog_2(image):
-    fg_mask = fgbg.apply(image)
+    fg_mask = fg_bg.apply(image)
     threshold = cv2.threshold(fg_mask, 128, 255, cv2.THRESH_BINARY)[1]
     return cv2.findContours(
         threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE

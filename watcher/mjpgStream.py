@@ -14,7 +14,7 @@ def log(line):
 
 
 def background_diff_mog_2(image):
-    fg_mask = fgbg.apply(image)
+    fg_mask = fg_bg.apply(image)
     threshold = cv2.threshold(fg_mask, 128, 255, cv2.THRESH_BINARY)[1]
     cv2.imshow("mog_threshold", threshold)
     return cv2.findContours(
@@ -68,7 +68,7 @@ log("Setting up")
 current_path = getcwd()
 initialization_time = floor(time())
 
-fgbg = cv2.createBackgroundSubtractorMOG2()
+fg_bg = cv2.createBackgroundSubtractorMOG2()
 
 captured_entities = []
 

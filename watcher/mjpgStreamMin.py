@@ -1,13 +1,13 @@
-from os import getcwd, path, makedirs
-
 import cv2
 import logging
 from sys import argv
 from time import time
 from math import floor
+from os import getcwd, path, makedirs
 
 from watcher.entities import Entity
 from watcher.request import register_with_server, get_access_token, add_motion
+from watcher.movement import background_diff_mog_2
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s:\t%(message)s",
@@ -15,15 +15,6 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 logger = logging.getLogger(__name__)
-
-
-def background_diff_mog_2(image):
-    fg_mask = fgbg.apply(image)
-    threshold = cv2.threshold(fg_mask, 128, 255, cv2.THRESH_BINARY)[1]
-    cv2.imshow("mog_threshold", threshold)
-    return cv2.findContours(
-        threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-    )[1]
 
 
 def save_to_local(image, entry_time, exit_time):
@@ -35,8 +26,9 @@ def save_to_local(image, entry_time, exit_time):
 
 
 def movement_recognition(existing_entities, new_frame):
+    global fg_bg
     preexisting_entities = existing_entities.copy()
-    mog_contours = background_diff_mog_2(new_frame)
+    mog_contours, fg_bg = background_diff_mog_2(new_frame, fg_bg)
 
     for found_contour in mog_contours:
         if cv2.contourArea(found_contour) >= minContourArea:
@@ -125,7 +117,7 @@ try:
 except ConnectionError as e:
     logger.error(e)
 logger.info("Starting")
-fgbg = cv2.createBackgroundSubtractorMOG2()
+fg_bg = cv2.createBackgroundSubtractorMOG2()
 
 captured_entities = []
 
