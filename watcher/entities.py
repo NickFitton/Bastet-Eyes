@@ -20,8 +20,18 @@ class Entity:
 
     @staticmethod
     def contains_entity(entity1, entity2):
-        x1, y1, w1, h1 = entity1.x, entity1.y, entity1.image.shape[1], entity1.image.shape[0]
-        x2, y2, w2, h2 = entity2.x, entity2.y, entity2.image.shape[1], entity2.image.shape[0]
+        x1, y1, w1, h1 = (
+            entity1.x,
+            entity1.y,
+            entity1.image.shape[1],
+            entity1.image.shape[0],
+        )
+        x2, y2, w2, h2 = (
+            entity2.x,
+            entity2.y,
+            entity2.image.shape[1],
+            entity2.image.shape[0],
+        )
 
         a = x2 < x1 + w1
         b = y2 < y1 + h1
@@ -31,7 +41,9 @@ class Entity:
         return a and b and c and d
 
     def intersects_with(self, other_entity):
-        return self.contains_entity(self, other_entity) or self.contains_entity(other_entity, self)
+        return self.contains_entity(self, other_entity) or self.contains_entity(
+            other_entity, self
+        )
 
     def is_entity(self, other_entity):
         if self.intersects_with(other_entity):
@@ -44,6 +56,29 @@ class Entity:
         self.x = entity.x
         self.y = entity.y
         self.image = entity.image
-        if self.best_image.shape[0] < entity.image.shape[0] and self.best_image.shape[1] < entity.image.shape[1]:
+        if (
+            self.best_image.shape[0] < entity.image.shape[0]
+            and self.best_image.shape[1] < entity.image.shape[1]
+        ):
             self.best_image = entity.image
             self.image_time = self.last_active
+
+
+class Statistic:
+    def __init__(self):
+        self.initialized_at = time()
+        self.entity_count = 0
+        self.interim_times = []
+
+    def set_count(self, count):
+        self.entity_count = count
+
+    def add_time(self):
+        self.interim_times.append(time())
+
+    def print_line(self):
+        line = "{},{}".format(self.entity_count, self.initialized_at)
+        for interim_time in self.interim_times:
+            line += ",{}".format(interim_time)
+        line += "\n"
+        return line
