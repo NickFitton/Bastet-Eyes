@@ -98,14 +98,15 @@ def __parse_response(response, expected_status_code):
 
 
 def register_with_server(server_url):
-    if __credentials_exist():
-        logger.debug("Loading previously saved credentials")
-        return __load_credentials()
+    # if __credentials_exist():
+    #     logger.debug("Loading previously saved credentials")
+    #     return __load_credentials()
 
     password = __generate_password()
     body = {"password": password}
 
     try:
+        logger.info("Registering with server")
         response = requests.post("{}/v1/cameras".format(server_url), json=body)
         data = __parse_response(response, 201)
         __save_credentials(data["id"], password)
@@ -115,24 +116,26 @@ def register_with_server(server_url):
 
 
 def get_access_token(server_url, camera_id, password):
-    if __token_exist():
-        logger.debug("Loading previously saved token")
-        return __load_token()
+    # if __token_exist():
+    #     logger.debug("Loading previously saved token")
+    #     return __load_token()
 
     auth_combo = base64.b64encode(
         "{}:{}".format(camera_id, password).encode("utf-8")
     ).decode("utf-8")
     auth_header = "Basic {}".format(auth_combo)
     logger.info(auth_header)
-    headers = {"authorization": auth_header}
+    headers = {"Authorization": auth_header}
 
+    logger.info("Retrieving access token")
     try:
         response = requests.post(
             "{}/v1/login/camera".format(server_url), headers=headers
         )
         new_token = __parse_response(response, 200)
         __save_token(new_token)
-        logger.info(new_token)
+        logger.info("Loaded access token: {}".format(new_token))
+        return new_token
     except InvalidSchema:
         raise ConnectionError("Failed to connect to server")
 
@@ -145,6 +148,7 @@ def add_motion(server_url, auth_token, new_entity):
         "imageTime": str(new_entity.image_time),
     }
     headers = {"authorization": "Token {}".format(auth_token)}
+    logger.info("Posting new motion")
     response = requests.post(
         "{}/v1/motion".format(server_url), json=metadata, headers=headers
     )
@@ -157,9 +161,24 @@ def add_motion(server_url, auth_token, new_entity):
     imwrite(file_location, new_entity.best_image)
 
     image_file = {"file": open(file_location, "rb")}
+    logger.info("Patching with image")
     response = requests.patch(
         "{}/v1/motion/{}".format(server_url, image_id),
         files=image_file,
         headers=headers,
     )
-    __parse_response(response, 202)
+    if not response.status_code == 202:
+        logger.error(
+            "Server returned bad request with status {}".format(response.status_code)
+        )
+        json = response.json()
+        if "error" in json:
+            raise ConnectionError(
+                "Bad communication with server[status={}, error={}]".format(
+                    response.status_code, json["error"]
+                )
+            )
+        else:
+            raise ConnectionError(
+                "Bad communication with server[status={}]".format(response.status_code)
+            )

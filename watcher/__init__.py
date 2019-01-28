@@ -1,4 +1,4 @@
 import logging
-import watcher.reactiveStream
+import watcher.mjpgStreamMin
 
 logger = logging.getLogger(__name__)
