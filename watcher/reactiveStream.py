@@ -1,7 +1,5 @@
-from watcher import displaySubscriber, inputPublisher
-from sys import argv
+from reactive import cameraInputPublisher, displaySubscriber
 import threading
-from cv2 import createBackgroundSubtractorMOG2
 
 
 def configuration(arguments):
@@ -24,16 +22,18 @@ def configuration(arguments):
     return media_url
 
 
-fg_bg = createBackgroundSubtractorMOG2()
-mjpg_url = configuration(argv)
+# file_path = configuration(argv)
 frame_buffer = []
 frame_condition = threading.Condition()
 
-inputStreamPublisher = inputPublisher.InputPublisher(
-    frame_buffer, frame_condition, mjpg_url
+# inputStreamPublisher = mjpegInputPublisher.InputPublisher(
+#     frame_buffer, frame_condition, mjpg_url
+# )
+inputStreamPublisher = cameraInputPublisher.CameraInputPublisher(
+    frame_buffer, frame_condition
 )
 displayStreamSubscriber = displaySubscriber.DisplaySubscriber(
-    frame_buffer, frame_condition, fg_bg
+    frame_buffer, frame_condition
 )
 
 inputStreamPublisher.start()
