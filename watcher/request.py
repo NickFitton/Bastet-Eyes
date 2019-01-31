@@ -7,11 +7,6 @@ import base64
 from cv2 import imwrite
 from requests.exceptions import InvalidSchema
 
-logging.basicConfig(
-    format="%(asctime)s - %(levelname)s:\t%(message)s",
-    datefmt="%m/%d/%Y %I:%M:%S %p",
-    level=logging.INFO,
-)
 logger = logging.getLogger(__name__)
 data_location = "/tmp/watcher"
 credentials_file_name = "credentials.csv"

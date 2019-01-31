@@ -3,6 +3,67 @@ import numpy as np
 from time import time
 
 
+class NewEntity:
+    def __init__(self, x, y, w, h):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.alive = True
+        self.image = None
+
+    @staticmethod
+    def touching(_e1, _e2):
+        return (
+            _e1.x1() < _e2.x2()
+            and _e1.x2() > _e2.x1()
+            and _e1.y1() < _e2.y2()
+            and _e1.y2() > _e2.y1()
+        )
+
+    def includes(self, entity):
+        _p2a = self.p2()
+        _p2b = entity.p2()
+
+        self.x = min(self.x, entity.x)
+        self.y = min(self.y, entity.y)
+        self.w = abs(self.x - max(_p2a[0], _p2b[0]))
+        self.h = abs(self.y - max(_p2a[1], _p2b[1]))
+
+    def set_image(self, frame):
+        self.image = frame[self.y : self.y + self.h, self.x : self.x + self.w]
+
+    def p1(self):
+        return self.x, self.y
+
+    def p2(self):
+        return self.x + self.w, self.y + self.h
+
+    def x1(self):
+        return self.x
+
+    def x2(self):
+        return self.x + self.w
+
+    def y1(self):
+        return self.y
+
+    def y2(self):
+        return self.y + self.h
+
+    def kill(self):
+        self.alive = False
+
+    def size(self):
+        return self.w * self.h
+
+    def scaled_p1(self, scale):
+        return int(self.x / scale), int(self.y / scale)
+
+    def scaled_p2(self, scale):
+        return int((self.x + self.w) / scale), int((self.y + self.h) / scale)
+
+
 class Entity:
     def __init__(self, x, y, image):
         self.last_active = time()
