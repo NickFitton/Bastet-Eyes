@@ -12,6 +12,6 @@ setup(
         "numpy>=1.15.1",
         "requests>=2.20.0",
         "black>=18.9b0",
-        "opencv-python",
+        "opencv-python>=3.4.5",
     ],
 )
