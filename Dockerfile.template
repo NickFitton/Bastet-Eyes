@@ -119,6 +119,7 @@ ENV READTHEDOCS True
 # This will copy all files in our root to the working  directory in the container
 COPY watcher/ watcher/
 COPY setup.py setup.py
+RUN pip3 install opencv-python
 
 RUN python3 setup.py install
 
