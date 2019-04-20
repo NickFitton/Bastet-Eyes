@@ -43,7 +43,7 @@
 FROM balenalib/raspberrypi3-python:3.7.2
 
 # Allow overriding the OpenCV version to build.
-ARG opencv_version=3.4.1
+ARG opencv_version=4.1.0.25
 
 # Informative labels.
 LABEL description="Docker container for Python OpenCV + OpenCV contrib on a Raspberry Pi.  Based on ResinIO's rpi-raspbian image and includes support for both Python 2 and 3.  OpenCV is compiled with ARM NEON optimizations as described in: https://www.pyimagesearch.com/2017/10/09/optimizing-opencv-on-the-raspberry-pi/  Note this takes about 1.5 hours to build from scratch on a Pi 3."
