@@ -1,4 +1,4 @@
 import logging
-import watcher.noReportAnalysis
+import watcher.mjpgStreamMin
 
 logger = logging.getLogger(__name__)
