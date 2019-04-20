@@ -40,7 +40,7 @@
 # Author: Tony DiCola
 
 # Base this on ResinIO's rpi-raspbian image.
-FROM resin/rpi-raspbian:stretch
+FROM balenalib/raspberrypi3-python:3.7.2
 
 # Allow overriding the OpenCV version to build.
 ARG opencv_version=3.4.1
