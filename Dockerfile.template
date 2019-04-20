@@ -115,7 +115,6 @@ ENV READTHEDOCS True
 
 # pip install python deps from requirements.txt on the resin.io build server
 # RUN pip install -r /requirements.txt
-RUN pip install opencv-python==3.4.4.19
 
 # This will copy all files in our root to the working  directory in the container
 COPY watcher/ watcher/
