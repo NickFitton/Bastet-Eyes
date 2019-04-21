@@ -4,7 +4,7 @@ FROM balenalib/raspberrypi3-python:2.7.15
 # Allow overriding the OpenCV version to build.
 ARG opencv_version=4.1.0
 
-RUN apt-get purge wolfram-engine libreoffice*
+RUN apt-get purge libreoffice*
 RUN apt-get clean
 RUN apt-get autoremove
 
