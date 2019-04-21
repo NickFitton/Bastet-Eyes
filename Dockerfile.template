@@ -35,7 +35,7 @@ RUN wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/
 RUN unzip opencv.zip
 RUN unzip opencv_contrib.zip
 RUN mv opencv-${opencv_version} opencv
-RUN mv opencv_contrib-${opencv-version} opencv_contrib
+RUN mv opencv_contrib-${opencv_version} opencv_contrib
 
 RUN wget https://bootstrap.pypa.io/get-pip.py
 RUN python3 get-pip.py
