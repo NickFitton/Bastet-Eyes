@@ -43,9 +43,9 @@ RUN rm get-pip.py
 
 RUN pip install numpy
 
-WORKDIR ~/opencv
+WORKDIR opencv
 RUN mkdir build
-WORKDIR build
+WORKDIR opencv/build
 
 RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D CMAKE_INSTALL_PREFIX=/usr/local \
