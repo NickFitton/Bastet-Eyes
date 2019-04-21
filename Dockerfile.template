@@ -57,14 +57,9 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D INSTALL_PYTHON_EXAMPLES=OFF \
     -D BUILD_EXAMPLES=OFF ..
 
-RUN echo "CONF_SWAPSIZE=2048" >> /etc/dphys-swapfile
-
-RUN dphys-swapfile setup
-RUN /etc/init.d/dphys-swapfile stop
-RUN /etc/init.d/dphys-swapfile start
-
-RUN make
+RUN make -j4
 RUN make install
+RUN make clean
 RUN ldconfig
 
 RUN sudo usermod -a -G video $(whoami)
