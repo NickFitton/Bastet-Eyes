@@ -1,0 +1,4 @@
+numpy>=1.15.1
+picamera==1.13
+requests>=2.20.0
+opencv-python>=3.4.5
