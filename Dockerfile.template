@@ -27,15 +27,15 @@ RUN apt-get install -y \
     libcanberra-gtk* \
     libatlas-base-dev \
     gfortran \
-    python3-dev
-RUN apt-get install -y wget
+    python3-dev \
+    wget
 
-RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/${opencv_version}.zip
-RUN wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/${opencv_version}.zip
-RUN unzip opencv.zip
-RUN unzip opencv_contrib.zip
-RUN mv opencv-${opencv_version} /tmp/opencv
-RUN mv opencv_contrib-${opencv_version} /tmp/opencv_contrib
+RUN wget -q -O opencv.zip https://github.com/opencv/opencv/archive/${opencv_version}.zip; \
+    unzip opencv.zip; \
+    mv opencv-${opencv_version} /tmp/opencv
+RUN wget -q -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/${opencv_version}.zip; \
+    unzip opencv_contrib.zip; \
+    mv opencv_contrib-${opencv_version} /tmp/opencv_contrib
 
 RUN wget https://bootstrap.pypa.io/get-pip.py
 RUN python3 get-pip.py
@@ -57,9 +57,7 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D INSTALL_PYTHON_EXAMPLES=OFF \
     -D BUILD_EXAMPLES=OFF ..
 
-RUN make -j4
-RUN make install
-RUN make clean
+RUN make -j4 --quiet; make install; make clean
 RUN ldconfig
 
 RUN sudo usermod -a -G video $(whoami)
