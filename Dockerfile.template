@@ -28,6 +28,7 @@ RUN apt-get install -y \
     libatlas-base-dev \
     gfortran \
     python3-dev
+RUN apt-get install -y wget
 
 RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/${opencv_version}.zip
 RUN wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/${opencv_version}.zip
