@@ -43,7 +43,7 @@ RUN rm get-pip.py
 
 RUN pip install numpy
 
-RUN cd ~/opencv
+WORKDIR ~/opencv
 RUN mkdir build
 RUN cd build
 
