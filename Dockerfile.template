@@ -34,8 +34,8 @@ RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/${opencv_version
 RUN wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/${opencv_version}.zip
 RUN unzip opencv.zip
 RUN unzip opencv_contrib.zip
-RUN mv opencv-${opencv_version} opencv
-RUN mv opencv_contrib-${opencv_version} opencv_contrib
+RUN mv opencv-${opencv_version} /tmp/opencv
+RUN mv opencv_contrib-${opencv_version} /tmp/opencv_contrib
 
 RUN wget https://bootstrap.pypa.io/get-pip.py
 RUN python3 get-pip.py
@@ -43,9 +43,9 @@ RUN rm get-pip.py
 
 RUN pip install numpy
 
-WORKDIR opencv
+WORKDIR /tmp/opencv
 RUN mkdir build
-WORKDIR build
+WORKDIR /tmp/opencv/build
 
 RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D CMAKE_INSTALL_PREFIX=/usr/local \
