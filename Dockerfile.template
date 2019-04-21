@@ -3,6 +3,7 @@ FROM balenalib/raspberrypi3-python:2.7.15
 
 # Allow overriding the OpenCV version to build.
 ARG opencv_version=4.1.0
+ARG server_url=5.64.142.116
 
 RUN apt-get purge libreoffice*
 RUN apt-get clean
@@ -60,10 +61,16 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
 RUN make -j4 --quiet; make install; make clean
 RUN ldconfig
 
+WORKDIR /home/pi
+COPY setup.py setup.py
+COPY watcher/ watcher/
+
+RUN python3 setup.py install
+
 RUN sudo usermod -a -G video $(whoami)
 
 # switch on systemd init system in container
 ENV INITSYSTEM on
 
 # main.py will run when container starts up on the device
-CMD ["sh","echo","'hello'"]
+CMD ["python3","-u","watcher/mjpgStreamMinCamera.py", "-s", server_url]
