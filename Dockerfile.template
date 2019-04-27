@@ -71,6 +71,7 @@ RUN apt-get autoremove
 WORKDIR /home/pi
 COPY setup.py setup.py
 COPY watcher/ watcher/
+RUN ls
 
 RUN python3 setup.py install
 
@@ -80,4 +81,4 @@ RUN sudo usermod -a -G video $(whoami)
 ENV INITSYSTEM on
 
 # main.py will run when container starts up on the device
-CMD ["python3","-u","watcher/mjpgStreamMinCamera.py", "-s", server_url]
+CMD ["python3","-u","watcher/mjpgStreamMinCamera.py", "-s", "${server_url}"]
