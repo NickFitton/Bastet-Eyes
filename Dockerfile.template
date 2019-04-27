@@ -61,7 +61,7 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
 RUN make -j4 --quiet; make install; make clean
 RUN ldconfig
 
-RUN ls /usr/local/lib/python3.5/site-packages/
+RUN ls /usr/local/lib/python3.5/*
 RUN mv /usr/local/lib/python3.5/site-packages/cv2.cpython-35m-arm-linux-gnueabihf.so /usr/local/lib/python3.5/site-packages/cv2.so
 
 WORKDIR /home/pi
