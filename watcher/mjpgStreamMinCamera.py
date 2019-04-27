@@ -155,12 +155,7 @@ for rawCapture in camera.capture_continuous(
             small_frame = frame.copy()
         # movement_recognition(captured_entities, small_frame, drawing_frame)
         frame_queue.put(small_frame)
-        cv2.imshow("Video", small_frame)
-        key = cv2.waitKey(1) & 0xFF
-
-        if key == ord("q"):
-            terminate_reporting.set()
-            break
+    rawCapture.terminate(0)
 
     frame_time = time()
     if frame_time - last_check > interval_sec:
