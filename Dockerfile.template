@@ -81,4 +81,4 @@ ENV INITSYSTEM on
 ENV server_url=5.64.142.116
 
 # main.py will run when container starts up on the device
-CMD python3 -u watcher/mjpgStreamMinCamera.py-s ${server_url}
+CMD python3 -u watcher/mjpgStreamMinCamera.py -s ${server_url}
