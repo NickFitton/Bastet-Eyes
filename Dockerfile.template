@@ -78,7 +78,7 @@ RUN sudo usermod -a -G video $(whoami)
 
 # switch on systemd init system in container
 ENV INITSYSTEM on
-ENV server_url=5.64.142.116
+ENV server_url="http://192.168.0.17:8080"
 
 # main.py will run when container starts up on the device
 CMD python3 -u watcher/mjpgStreamMinCamera.py -s ${server_url}
