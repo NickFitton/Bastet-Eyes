@@ -73,8 +73,7 @@ COPY watcher/ watcher/
 RUN ls
 
 RUN python3 setup.py install
-
-RUN sudo usermod -a -G video $(whoami)
+RUN usermod -a -G video $(whoami)
 
 # switch on systemd init system in container
 ENV INITSYSTEM on
