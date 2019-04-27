@@ -139,10 +139,10 @@ last_check = time()
 logger.info("Setup complete, recording at scale {}".format(video_scale))
 
 camera = PiCamera()
-camera.resolution = (1640, 1232)
-camera.framerate = 32
+camera.resolution = (1280, 720)
+camera.framerate = 30
 camera.rotation = 180
-rawCapture = PiRGBArray(camera)
+rawCapture = PiRGBArray(camera, size=(1280, 720))
 for rawCapture in camera.capture_continuous(
     rawCapture, format="bgr", use_video_port=True
 ):
