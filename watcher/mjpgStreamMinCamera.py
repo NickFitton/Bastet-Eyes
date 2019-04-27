@@ -156,6 +156,7 @@ for rawCapture in camera.capture_continuous(
         # movement_recognition(captured_entities, small_frame, drawing_frame)
         frame_queue.put(small_frame)
     rawCapture.truncate(0)
+    key = cv2.waitKey(1) & 0xFF
 
     frame_time = time()
     if frame_time - last_check > interval_sec:

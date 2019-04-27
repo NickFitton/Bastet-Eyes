@@ -20,8 +20,8 @@ initialization_time = floor(time())
 
 fg_bg = cv2.createBackgroundSubtractorMOG2()
 camera = PiCamera()
-camera.resolution = (1640, 1232)
-camera.framerate = 32
+camera.resolution = (1280, 720)
+camera.framerate = 15
 camera.rotation = 180
 rawCapture = PiRGBArray(camera)
 
@@ -56,7 +56,7 @@ def save_to_server(image, entry_time, exit_time, image_time):
 
     imagefile = {"file": open(file_location, "rb")}
     response = requests.patch(
-        "http://192.168.0.28:8080/image/{}".format(image_id), files=imagefile
+        "http://192.168.0.17:8080/image/{}".format(image_id), files=imagefile
     )
     if response.status_code == 202:
         remove(file_location)
