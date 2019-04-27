@@ -61,6 +61,13 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
 RUN make -j4 --quiet; make install; make clean
 RUN ldconfig
 
+RUN rm -r /tmp/opencv
+RUN rm -r /tmp/opencv_contrib
+
+RUN apt-get remove wget
+RUN apt-get clean
+RUN apt-get autoremove
+
 WORKDIR /home/pi
 COPY setup.py setup.py
 COPY watcher/ watcher/
