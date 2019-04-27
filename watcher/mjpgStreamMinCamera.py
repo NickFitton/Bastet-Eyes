@@ -139,10 +139,10 @@ last_check = time()
 logger.info("Setup complete, recording at scale {}".format(video_scale))
 
 camera = PiCamera()
-camera.resolution = (1640, 1232)
-camera.framerate = 32
+camera.resolution = (1280, 720)
+camera.framerate = 30
 camera.rotation = 180
-rawCapture = PiRGBArray(camera)
+rawCapture = PiRGBArray(camera, size=(1280, 720))
 for rawCapture in camera.capture_continuous(
     rawCapture, format="bgr", use_video_port=True
 ):
@@ -155,12 +155,8 @@ for rawCapture in camera.capture_continuous(
             small_frame = frame.copy()
         # movement_recognition(captured_entities, small_frame, drawing_frame)
         frame_queue.put(small_frame)
-        cv2.imshow("Video", small_frame)
-        key = cv2.waitKey(1) & 0xFF
-
-        if key == ord("q"):
-            terminate_reporting.set()
-            break
+    rawCapture.truncate(0)
+    key = cv2.waitKey(1) & 0xFF
 
     frame_time = time()
     if frame_time - last_check > interval_sec:
@@ -175,4 +171,5 @@ for rawCapture in camera.capture_continuous(
         last_check = frame_time
         frame_count = 0
 
+logger.info("Complete")
 stats_file.close()

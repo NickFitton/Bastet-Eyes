@@ -2,7 +2,7 @@
 FROM balenalib/raspberrypi3-python:2.7.15
 
 # Allow overriding the OpenCV version to build.
-ARG opencv_version=4.1.0
+ARG opencv_version=3.4.6
 
 RUN apt-get purge libreoffice*
 RUN apt-get clean
@@ -27,15 +27,15 @@ RUN apt-get install -y \
     libcanberra-gtk* \
     libatlas-base-dev \
     gfortran \
-    python3-dev
-RUN apt-get install -y wget
+    python3-dev \
+    wget
 
-RUN wget -O opencv.zip https://github.com/opencv/opencv/archive/${opencv_version}.zip
-RUN wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/${opencv_version}.zip
-RUN unzip opencv.zip
-RUN unzip opencv_contrib.zip
-RUN mv opencv-${opencv_version} opencv
-RUN mv opencv_contrib-${opencv_version} opencv_contrib
+RUN wget -q -O opencv.zip https://github.com/opencv/opencv/archive/${opencv_version}.zip; \
+    unzip opencv.zip; \
+    mv opencv-${opencv_version} /tmp/opencv
+RUN wget -q -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/${opencv_version}.zip; \
+    unzip opencv_contrib.zip; \
+    mv opencv_contrib-${opencv_version} /tmp/opencv_contrib
 
 RUN wget https://bootstrap.pypa.io/get-pip.py
 RUN python3 get-pip.py
@@ -43,13 +43,13 @@ RUN rm get-pip.py
 
 RUN pip install numpy
 
-WORKDIR ~/opencv
+WORKDIR /tmp/opencv
 RUN mkdir build
-RUN cd build
+WORKDIR /tmp/opencv/build
 
 RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D CMAKE_INSTALL_PREFIX=/usr/local \
-    -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
+    -D OPENCV_EXTRA_MODULES_PATH=/tmp/opencv_contrib/modules \
     -D ENABLE_NEON=ON \
     -D ENABLE_VFPV3=ON \
     -D BUILD_TESTS=OFF \
@@ -57,19 +57,27 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D INSTALL_PYTHON_EXAMPLES=OFF \
     -D BUILD_EXAMPLES=OFF ..
 
-RUN echo "CONF_SWAPSIZE=2048" >> /etc/dphys-swapfile
-
-RUN /etc/init.d/dphys-swapfile stop
-RUN /etc/init.d/dphys-swapfile start
-
-RUN make
-RUN make install
+RUN make -j4 --quiet; make install; make clean
 RUN ldconfig
 
-RUN sudo usermod -a -G video $(whoami)
+RUN rm -r /tmp/opencv
+RUN rm -r /tmp/opencv_contrib
+
+RUN apt-get remove wget
+RUN apt-get clean
+RUN apt-get autoremove
+
+WORKDIR /home/pi
+COPY setup.py setup.py
+COPY watcher/ watcher/
+RUN ls
+
+RUN usermod -a -G video $(whoami)
+RUN python3 setup.py install
 
 # switch on systemd init system in container
 ENV INITSYSTEM on
+ENV server_url="http://192.168.0.17:8080"
 
 # main.py will run when container starts up on the device
-CMD ["sh","echo","'hello'"]
+CMD python3 -u watcher/mjpgStreamMinCamera.py -s ${server_url}

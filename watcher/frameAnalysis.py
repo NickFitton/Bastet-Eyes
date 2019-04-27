@@ -32,7 +32,8 @@ class Analyzer(Thread):
         preexisting_entities = self.captured_entities.copy()
         mog_contours = self.background_diff_mog_2(new_frame)
         for found_contour in mog_contours:
-            if cv2.contourArea(found_contour) >= self.min_contour_area:
+            area = cv2.contourArea(found_contour)
+            if area >= self.min_contour_area:
                 x, y, w, h = cv2.boundingRect(found_contour)
                 new_entity = Entity(x, y, new_frame[y : y + h, x : x + w])
                 entity_exists = False
