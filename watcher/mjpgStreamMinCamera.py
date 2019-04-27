@@ -170,4 +170,5 @@ for rawCapture in camera.capture_continuous(
         last_check = frame_time
         frame_count = 0
 
+logger.info("Complete")
 stats_file.close()
