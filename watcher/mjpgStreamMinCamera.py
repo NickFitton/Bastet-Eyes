@@ -155,7 +155,7 @@ for rawCapture in camera.capture_continuous(
             small_frame = frame.copy()
         # movement_recognition(captured_entities, small_frame, drawing_frame)
         frame_queue.put(small_frame)
-    rawCapture.terminate(0)
+    rawCapture.truncate(0)
 
     frame_time = time()
     if frame_time - last_check > interval_sec:
