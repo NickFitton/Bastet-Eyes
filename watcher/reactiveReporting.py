@@ -1,7 +1,7 @@
 from threading import Thread
 from requests import post, patch
-from os.path import join
-from os import remove
+from os.path import join, isdir
+from os import remove, mkdir
 from cv2 import imwrite
 from time import sleep
 import logging
@@ -17,6 +17,8 @@ class Reporter(Thread):
         self.term_event = terminate_event
         self.headers = {"authorization": "Token {}".format(auth_token)}
         self.storage_location = tmp_location
+        if not isdir(tmp_location):
+            mkdir(tmp_location)
         self.logger = logging.getLogger(__name__)
         Thread.__init__(self, name="Reporter", daemon=True)
 
