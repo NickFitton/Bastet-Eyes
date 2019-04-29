@@ -4,7 +4,6 @@ from os.path import join, isdir
 from os import remove, mkdir
 from cv2 import imwrite
 from time import sleep
-import logging
 
 
 class Reporter(Thread):
@@ -19,12 +18,10 @@ class Reporter(Thread):
         self.storage_location = tmp_location
         if not isdir(tmp_location):
             mkdir(tmp_location)
-        self.logger = logging.getLogger(__name__)
         Thread.__init__(self, name="Reporter", daemon=True)
 
     # Posts a new entity to the backend
     def post_new_motion(self, _entity):
-        self.logger.info("Posting new motion")
         metadata = {
             "entryTime": str(_entity.first_active),
             "exitTime": str(_entity.last_active),
@@ -44,7 +41,6 @@ class Reporter(Thread):
 
     # Updates a given entity with an image
     def patch_motion(self, _entity, _id):
-        self.logger.info("Patching motion {} with image".format(_id))
         file_name = "{}.jpg".format(_id)
         file_location = join(self.storage_location, file_name)
 
@@ -68,11 +64,9 @@ class Reporter(Thread):
     def run(self):
         while not self.term_event.is_set():
             while not self.queue.empty():
-                self.logger.info("Entity received")
                 entity = self.queue.get()
 
                 entity_id = self.post_new_motion(entity)
                 self.patch_motion(entity, entity_id)
                 self.queue.task_done()
-                self.logger.info("Entity processed")
             sleep(1)
