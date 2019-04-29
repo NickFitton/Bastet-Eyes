@@ -93,9 +93,9 @@ def __parse_response(response, expected_status_code):
 
 
 def register_with_server(server_url):
-    # if __credentials_exist():
-    #     logger.debug("Loading previously saved credentials")
-    #     return __load_credentials()
+    if __credentials_exist():
+        logger.debug("Loading previously saved credentials")
+        return __load_credentials()
 
     password = __generate_password()
     body = {"password": password}

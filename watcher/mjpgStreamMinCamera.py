@@ -167,7 +167,7 @@ for rawCapture in camera.capture_continuous(
                 )
             )
             terminate_reporting.set()
-        logger.info("FPS: {}".format(ceil(frame_count / interval_sec)))
+        # logger.info("FPS: {}".format(ceil(frame_count / interval_sec)))
         last_check = frame_time
         frame_count = 0
 
