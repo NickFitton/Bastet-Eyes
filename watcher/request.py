@@ -21,6 +21,7 @@ def __generate_password():
 
 
 def __save(file_name, line):
+    logger.info("Saving [" + line + "] to file [" + data_location + "/" + file_name + "]")
     if not os.path.isdir(data_location):
         os.mkdir(data_location)
     with open(os.path.join(data_location, file_name), "w+") as file:
