@@ -8,11 +8,11 @@ import os
 import queue
 import threading
 
-from watcher.entities import Entity
-from watcher.request import register_with_server, get_access_token
-from watcher.movement import background_diff_mog_2
-from watcher.reactiveReporting import Reporter
-from watcher.frameAnalysis import Analyzer
+from src.entities import Entity
+from src.request import register_with_server, get_access_token
+from src.movement import background_diff_mog_2
+from src.reactiveReporting import Reporter
+from src.frameAnalysis import Analyzer
 
 logging.basicConfig(
     format="[%(threadName)s\t] %(asctime)s - %(levelname)s:\t%(message)s",
@@ -80,8 +80,6 @@ def movement_recognition(existing_entities, new_frame, drawing_frame):
 def configuration(arguments):
     num_args = len(arguments)
     if num_args < 2 or ((arguments[2] == "-h") | (arguments[2] == "--help")):
-        print("Required arguments:")
-        print("-m\tMedia Url")
         print("Optional arguments:")
         print("-s\tServer Url")
         print("-c\tMinimum Contour")
@@ -89,28 +87,20 @@ def configuration(arguments):
         exit(0)
 
     server_url = ""
-    media_url = ""
     contour = 3000
     scale = 1
 
     for i in range(0, num_args):
         if arguments[i] == "-s":
             server_url = arguments[i + 1]
-        elif arguments[i] == "-m":
-            media_url = arguments[i + 1]
         elif arguments[i] == "-c":
             contour = int(arguments[i + 1])
         elif arguments[i] == "--scale":
             scale = float(arguments[i + 1])
-
-    if media_url == "":
-        print("Media url must be supplied")
-        exit(1)
-
-    return server_url, media_url, contour, scale
+    return server_url, contour, scale
 
 
-backend_url, mjpg_url, minContourArea, video_scale = configuration(argv)
+backend_url, minContourArea, video_scale = configuration(argv)
 stats_dir = "/tmp/stats"
 stats_file_name = str(time())
 current_path = getcwd()
@@ -136,7 +126,7 @@ movement_reporter = Reporter(
     terminate_reporting,
     backend_url,
     token,
-    tmp_location="/tmp/watcher",
+    tmp_location="/tmp/src",
 )
 frame_analyser.start()
 movement_reporter.start()
@@ -146,10 +136,10 @@ frame_count = 0
 last_check = time()
 logger.info("Setup complete, recording at scale {}".format(video_scale))
 
-cap = cv2.VideoCapture(mjpg_url)
+cap = cv2.VideoCapture(0)
 while not terminate_reporting.is_set():
     ret, frame = cap.read()
-    if frame is not None and ret is True:
+    if frame is not None:
         frame_count += 1
         if video_scale != 1:
             small_frame = cv2.resize(frame, (0, 0), fx=video_scale, fy=video_scale)
@@ -157,17 +147,12 @@ while not terminate_reporting.is_set():
             small_frame = frame.copy()
         # movement_recognition(captured_entities, small_frame, drawing_frame)
         frame_queue.put(small_frame)
-        cv2.imshow("Video", small_frame)
-        key = cv2.waitKey(1) & 0xFF
-
-        if key == ord("q"):
-            terminate_reporting.set()
-            break
+    key = cv2.waitKey(1) & 0xFF
 
     frame_time = time()
     if frame_time - last_check > interval_sec:
         if frame_count == 0:
-            logger.warn(
+            logger.warning(
                 "Shutting down, no frames received in past {} seconds".format(
                     interval_sec
                 )
@@ -177,4 +162,5 @@ while not terminate_reporting.is_set():
         last_check = frame_time
         frame_count = 0
 
+logger.info("Complete")
 stats_file.close()

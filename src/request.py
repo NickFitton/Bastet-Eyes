@@ -8,7 +8,7 @@ from cv2 import imwrite
 from requests.exceptions import InvalidSchema
 
 logger = logging.getLogger(__name__)
-data_location = "/tmp/watcher"
+data_location = "/tmp/src"
 credentials_file_name = "credentials.csv"
 token_file_name = "token.csv"
 

@@ -10,7 +10,7 @@ import logging
 class Reporter(Thread):
     # Initialization of the reporter thread, loads with everything it needs to communicate with the server
     def __init__(
-        self, queue, terminate_event, host, auth_token, tmp_location="/tmp/watcher"
+        self, queue, terminate_event, host, auth_token, tmp_location="/tmp/src"
     ):
         self.host = host
         self.queue = queue
