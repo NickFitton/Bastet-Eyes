@@ -80,8 +80,9 @@ def movement_recognition(existing_entities, new_frame, drawing_frame):
 def configuration(arguments):
     num_args = len(arguments)
     if num_args < 2 or ((arguments[2] == "-h") | (arguments[2] == "--help")):
-        print("Optional arguments:")
+        print("Required arguments:")
         print("-s\tServer Url")
+        print("Optional arguments:")
         print("-c\tMinimum Contour")
         print("--scale\tStream scale")
         exit(0)
