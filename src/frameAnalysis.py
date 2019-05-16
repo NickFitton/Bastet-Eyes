@@ -2,7 +2,7 @@ from threading import Thread
 import cv2
 from time import sleep
 import logging
-from watcher.entities import Entity
+from src.entities import Entity
 from time import time
 
 
@@ -23,17 +23,16 @@ class Analyzer(Thread):
     def background_diff_mog_2(self, image):
         fg_mask = self.fg_bg.apply(image)
         threshold = cv2.threshold(fg_mask, 128, 255, cv2.THRESH_BINARY)[1]
-        return cv2.findContours(
-            threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-        )[1]
+        return cv2.findContours(threshold.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
 
     def movement_recognition(self, new_frame):
         preexisting_entities = self.captured_entities.copy()
         mog_contours = self.background_diff_mog_2(new_frame)
         for found_contour in mog_contours:
-            if cv2.contourArea(found_contour) >= self.min_contour_area:
+            area = cv2.contourArea(found_contour)
+            if area >= self.min_contour_area:
                 x, y, w, h = cv2.boundingRect(found_contour)
-                new_entity = Entity(x, y, new_frame[y : y + h, x : x + w])
+                new_entity = Entity(x, y, new_frame[y: y + h, x: x + w])
                 entity_exists = False
                 for preexisting_entity in preexisting_entities:
                     if (not entity_exists) and preexisting_entity.is_entity(new_entity):

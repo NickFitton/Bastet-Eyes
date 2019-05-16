@@ -7,11 +7,11 @@ setup(
     author="Nicholas Fitton",
     author_email="githubcamera@nfitton.com",
     url="https://github.com/NickFitton/Intelligent-CCTV_camera",
-    packages=["watcher"],
+    packages=["src"],
     install_requires=[
         "numpy>=1.15.1",
         "requests>=2.20.0",
-        "picamera"
+        # "picamera"
         # "black>=18.9b0",
         # "opencv-python==4.1.0",
     ],

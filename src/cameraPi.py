@@ -10,11 +10,11 @@ import threading
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 
-from watcher.entities import Entity
-from watcher.request import register_with_server, get_access_token
-from watcher.movement import background_diff_mog_2
-from watcher.reactiveReporting import Reporter
-from watcher.frameAnalysis import Analyzer
+from src.entities import Entity
+from src.request import register_with_server, get_access_token
+from src.movement import background_diff_mog_2
+from src.reactiveReporting import Reporter
+from src.frameAnalysis import Analyzer
 
 logging.basicConfig(
     format="[%(threadName)s\t] %(asctime)s - %(levelname)s:\t%(message)s",
@@ -128,7 +128,7 @@ movement_reporter = Reporter(
     terminate_reporting,
     backend_url,
     token,
-    tmp_location="/tmp/watcher",
+    tmp_location="/tmp/src",
 )
 frame_analyser.start()
 movement_reporter.start()
